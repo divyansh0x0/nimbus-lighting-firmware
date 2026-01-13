@@ -82,15 +82,16 @@ namespace ROBO {
             return *this;
         }
         void turnOn(const CRGB color = CRGB::White) {
-            this->turnOn(-1, color);
+            this->turnOn(-1, 0, color);
         }
-        void turnOn(const int count, const CRGB color,const int start = 0) {
+        void turnOn(const int count, const int start = 0, const CRGB color = CRGB::White) {
             const int end = count < 0 ? length : start + count;
             if (start < 0 || end > length)
                 return;
             for (int i = start; i < end; i++) {
                 leds[i] = color;
             }
+            Serial.println("id:" + String(id) + " is ON from " + String(start) + " to " + String(end));
             FastLED.show();
         }
         void turnOff() {
@@ -104,6 +105,7 @@ namespace ROBO {
             for (int i = start; i < end; i++) {
                 leds[i] = CRGB::Black;
             }
+            Serial.println("id:" + String(id) + " is OFF from " + String(start) + " to " + String(end));
             FastLED.show();
         }
 

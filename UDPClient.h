@@ -47,27 +47,27 @@ namespace ROBO {
             if (packetSize <= 0)
                 return NO_LED_STATE_CHANGE;
 
-            if (packetSize != 4) {
+            constexpr int BUFFER_LEN = 2;
+            if (packetSize != BUFFER_LEN) {
                 // Drain invalid packet
                 while (udp.available())
                     udp.read();
                 return NO_LED_STATE_CHANGE;
             }
 
-            uint8_t buf[4];
-            udp.read(buf, 4);
+            uint8_t buf[BUFFER_LEN];
+            udp.read(buf, BUFFER_LEN);
 
             // Cast buff[0] to 16 bit then shift 8 bits to left which give xxxxxxx00000000,
             // taking or with this gives xxxxxxxxyyyyyyyy
             // This assumes big endian of buff data;
-            const uint16_t timeSec = (static_cast<uint16_t>(buf[0]) << 8) | buf[1];
-            const uint8_t id = buf[2];
-            const uint8_t state = buf[3];
+            const uint8_t id = buf[0];
+            const uint8_t state = buf[1];
 
             // Basic validation
             if (state > 1)
                 return NO_LED_STATE_CHANGE;
-            return ControlCommand(state, id, timeSec);
+            return ControlCommand(state, id);
         }
     };
 }
