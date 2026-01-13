@@ -51,6 +51,14 @@ namespace ROBO {
             return *this;
         }
 
+        unsigned int getLength() const {
+            return this->length;
+        }
+
+        struct CRGB * getArr() const {
+            return this->leds;
+        }
+
         // Move constructor
         LEDStrip(LEDStrip &&other) noexcept
             : leds(other.leds), length(other.length), id(other.id) {
@@ -88,7 +96,7 @@ namespace ROBO {
         void turnOff() {
             this->turnOff(-1,0);
         }
-        void turnOff(const int count = -1, const int start = 0) {
+        void turnOff(const int count, const int start = 0) {
             const int end = count < 0 ? length : start + count;
             if (start < 0 || end > length)
                 return;

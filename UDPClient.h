@@ -10,12 +10,13 @@
 inline void blink() {
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, LOW);
-    delay(100);
+    delay(50);
     digitalWrite(LED_BUILTIN, HIGH);
-    delay(100);
+    delay(50);
     digitalWrite(LED_BUILTIN, LOW);
-    delay(100);
+    delay(50);
     digitalWrite(LED_BUILTIN, HIGH);
+    delay(50);
 }
 
 namespace ROBO {
@@ -30,8 +31,9 @@ namespace ROBO {
             WiFi.begin(ssid, password);
             Serial.println("Connecting to WiFi");
             while (WiFi.status() != WL_CONNECTED) {
+                delay(500);
                 blink();
-                Serial.print(".");
+                Serial.println("Connecting to "+String(ssid) + "...");
             }
             Serial.println("Connected");
             Serial.print("Local IP:");

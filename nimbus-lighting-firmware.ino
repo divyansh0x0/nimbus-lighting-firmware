@@ -18,9 +18,12 @@ ROBO::UDPClient udpClient = ROBO::UDPClient();
 
 void setup() {
     // write your initialization code here
+
+    Serial.begin(115200);
+    delay(250);
     pinMode(LED_BUILTIN, OUTPUT);
-    FastLED.addLeds<WS2812B, 1, COLOR_MODE>(strip1, strip1.length);
-    FastLED.addLeds<WS2812B, 2, COLOR_MODE>(strip2, strip2.length);
+    FastLED.addLeds<WS2812B, 4, COLOR_MODE>(strip1.getArr(), strip1.getLength());
+    FastLED.addLeds<WS2812B, 5, COLOR_MODE>(strip2.getArr(), strip2.getLength());
     FastLED.setBrightness(255);
     strip1.turnOff();
     strip2.turnOff();
@@ -36,7 +39,7 @@ void processByte() {
 void loop() {
     const ROBO::ControlCommand cmd = udpClient.get();
     if (cmd.state == ROBO::LEDState::UNSET) {
-        Serial.println("Invalid state of LED skipping");
+        Serial.print(".");
         return;
     }
     Serial.println("----");
