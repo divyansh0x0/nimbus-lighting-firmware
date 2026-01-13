@@ -5,7 +5,14 @@ ESP_IP = input("IP:") or "10.196.39.137"   # <-- change to ESP8266 IP
 ESP_PORT = int(input("Port: ") or "8080")
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
+my_pattern = """
+1s ON 1
+2s ON 2
+3s OFF 1,2
+4s ON 1,2
+5s OFF 1
+6s OFF 2 
+""".strip()
 def send_command(cmd_id: int, state: int):
     # Ensure time wraps as uint16
 

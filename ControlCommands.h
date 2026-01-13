@@ -6,13 +6,13 @@ namespace ROBO{
         OFF = 1,
         UNSET = 2,
     };
-    struct ControlCommand{
+    struct LEDControlCommand{
         LEDState state;
         uint8_t id;
 
-        ControlCommand() = default;
+        LEDControlCommand() = default;
 
-        ControlCommand(const uint8_t state, const uint8_t id) {
+        LEDControlCommand(const uint8_t state, const uint8_t id) {
             switch (state) {
                 case 0:
                     this->state = LEDState::OFF;
@@ -29,7 +29,7 @@ namespace ROBO{
         }
     };
     // Any state other than 0 or 1 is invalid
-    static ControlCommand NO_LED_STATE_CHANGE = {3, 0};
+    static LEDControlCommand NO_LED_STATE_CHANGE = {3, 0};
 
 }
     

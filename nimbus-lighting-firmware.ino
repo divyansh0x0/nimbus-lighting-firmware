@@ -25,15 +25,12 @@ ROBO::LEDStrip strips[] = {
 auto udpClient = ROBO::UDPClient();
 
 void setup() {
-    // write your initialization code here
-
     Serial.begin(115200);
     delay(250);
     pinMode(LED_BUILTIN, OUTPUT);
 
     FastLED.addLeds<WS2812B, 4, COLOR_MODE>(strips[0].getArr(), strips[0].getLength());
     FastLED.addLeds<WS2812B, 5, COLOR_MODE>(strips[1].getArr(), strips[1].getLength());
-
 
     FastLED.setBrightness(255);
     strips[0].turnOff();
@@ -44,8 +41,10 @@ void setup() {
     udpClient.init(WIFI_SSID,WIFI_PASSWORD, UDP_PORT);
 }
 
-// For testing purpose only
-void singleStripCmd(const ROBO::ControlCommand cmd) {
+/**
+ * For testing purpose only, redundant in production
+*/
+void singleStripCmd(const ROBO::LEDControlCommand cmd) {
     auto &led_strip = strips[0]; // use reference to avoid copying
     if (cmd.id < 0 || cmd.id >= TESTING_STRIP_PARTS) {
         Serial.println("id:" + String(cmd.id) + " is invalid. Skipping over");
@@ -73,7 +72,7 @@ void singleStripCmd(const ROBO::ControlCommand cmd) {
 }
 
 
-void handleMultiStripCmd(const ROBO::ControlCommand cmd) {
+void handleMultiStripCmd(const ROBO::LEDControlCommand cmd) {
     if (cmd.id < BASE_ID_COUNT || cmd.id > BASE_ID_COUNT + ARRAY_LEN(strips)) {
         Serial.println("id:" + String(cmd.id) + " is invalid. Skipping over");
         return;
@@ -93,9 +92,8 @@ void handleMultiStripCmd(const ROBO::ControlCommand cmd) {
 }
 
 void loop() {
-    const ROBO::ControlCommand cmd = udpClient.get();
+    const ROBO::LEDControlCommand cmd = udpClient.get();
     if (cmd.state == ROBO::LEDState::UNSET) {
-        // Serial.print(".");
         return;
     }
     Serial.println("----");

@@ -8,10 +8,16 @@
 namespace ROBO {
     class LEDStrip {
     private:
+
         CRGB *leds;
         unsigned int length;
         unsigned char id;
 
+        /**
+         * @param leds A pointer to array of CRGB. Note: The array will be owned by the LEDStrip object once passed
+         * @param count Size of CRGB array
+         * @param id id of strip
+         */
         LEDStrip(CRGB *leds, const int count, const unsigned char id) {
             this->leds = leds;
             this->length = count;
@@ -19,11 +25,6 @@ namespace ROBO {
         };;
 
     public:
-        /**
-         * This is the CRGB array owned by LEDStrip. It will get auto deleted when the LEDStrip gets deleted;
-         */
-
-
         LEDStrip() = delete;
 
         // Copy constructor
@@ -51,14 +52,6 @@ namespace ROBO {
             return *this;
         }
 
-        unsigned int getLength() const {
-            return this->length;
-        }
-
-        struct CRGB * getArr() const {
-            return this->leds;
-        }
-
         // Move constructor
         LEDStrip(LEDStrip &&other) noexcept
             : leds(other.leds), length(other.length), id(other.id) {
@@ -81,9 +74,11 @@ namespace ROBO {
             other.length = 0;
             return *this;
         }
+
         void turnOn(const CRGB color = CRGB::White) {
             this->turnOn(-1, 0, color);
         }
+
         void turnOn(const int count, const int start = 0, const CRGB color = CRGB::White) {
             const int end = count < 0 ? length : start + count;
             if (start < 0 || end > length)
@@ -94,9 +89,11 @@ namespace ROBO {
             Serial.println("id:" + String(id) + " is ON from " + String(start) + " to " + String(end));
             FastLED.show();
         }
+
         void turnOff() {
-            this->turnOff(-1,0);
+            this->turnOff(-1, 0);
         }
+
         void turnOff(const int count, const int start = 0) {
             const int end = count < 0 ? length : start + count;
             if (start < 0 || end > length)
@@ -115,6 +112,15 @@ namespace ROBO {
 
         static LEDStrip create(const int count, const unsigned char id) {
             return LEDStrip{new CRGB[count], count, id};
+        }
+
+        // Getters
+        unsigned int getLength() const {
+            return this->length;
+        }
+
+        struct CRGB *getArr() const {
+            return this->leds;
         }
     };
 }
