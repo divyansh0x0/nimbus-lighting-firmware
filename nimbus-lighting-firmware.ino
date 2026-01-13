@@ -39,8 +39,9 @@ void loop() {
         Serial.println("Invalid state of LED skipping");
         return;
     }
-    Serial.println(cmd.id);
-    Serial.println(cmd.time);
+    Serial.println("----");
+    Serial.println("id:" + String(cmd.id));
+    Serial.println("time:"  + String(cmd.time) + "s");
     Serial.println(cmd.state == ROBO::LEDState::ON ? "ON" : "OFF");
 
     // strip1.turnOn(LED_COUNT/2);

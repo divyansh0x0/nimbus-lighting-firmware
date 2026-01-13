@@ -5,45 +5,106 @@
 
 #include "FastLED.h"
 
-namespace ROBO
-{
-    struct LEDStrip
-    {
+namespace ROBO {
+    class LEDStrip {
+    private:
+        CRGB *leds;
+        unsigned int length;
+        unsigned char id;
+
+        LEDStrip(CRGB *leds, const int count, const unsigned char id) {
+            this->leds = leds;
+            this->length = count;
+            this->id = id;
+        };;
+
+    public:
         /**
          * This is the CRGB array owned by LEDStrip. It will get auto deleted when the LEDStrip gets deleted;
          */
-        CRGB *arr;
-        int length;
-        unsigned char id;
 
-        void turnOn(const int count = -1, const int start = 0, const CRGB color = CRGB::White)
-        {
-            int end = count < 0 ? length : start+ count;
-            for (int i = start; i < end; i++)
-            {
-                arr[i] = color;
+
+        LEDStrip() = delete;
+
+        // Copy constructor
+        LEDStrip(const LEDStrip &other)
+            : length(other.length), id(other.id) {
+            leds = new CRGB[length];
+            for (size_t i = 0; i < length; ++i)
+                leds[i] = other.leds[i];
+        }
+
+        // Copy assignment (deep copy)
+        LEDStrip &operator=(const LEDStrip &other) {
+            if (this == &other)
+                return *this;
+
+            delete[] leds;
+
+            length = other.length;
+            id = other.id;
+            leds = new CRGB[length];
+
+            for (size_t i = 0; i < length; ++i)
+                leds[i] = other.leds[i];
+
+            return *this;
+        }
+
+        // Move constructor
+        LEDStrip(LEDStrip &&other) noexcept
+            : leds(other.leds), length(other.length), id(other.id) {
+            other.leds = nullptr;
+            other.length = 0;
+        }
+
+        // Move assignment
+        LEDStrip &operator=(LEDStrip &&other) noexcept {
+            if (this == &other)
+                return *this;
+
+            delete[] leds;
+
+            leds = other.leds;
+            length = other.length;
+            id = other.id;
+
+            other.leds = nullptr;
+            other.length = 0;
+            return *this;
+        }
+        void turnOn(const CRGB color = CRGB::White) {
+            this->turnOn(-1, color);
+        }
+        void turnOn(const int count, const CRGB color,const int start = 0) {
+            const int end = count < 0 ? length : start + count;
+            if (start < 0 || end > length)
+                return;
+            for (int i = start; i < end; i++) {
+                leds[i] = color;
+            }
+            FastLED.show();
+        }
+        void turnOff() {
+            this->turnOff(-1,0);
+        }
+        void turnOff(const int count = -1, const int start = 0) {
+            const int end = count < 0 ? length : start + count;
+            if (start < 0 || end > length)
+                return;
+
+            for (int i = start; i < end; i++) {
+                leds[i] = CRGB::Black;
             }
             FastLED.show();
         }
 
-        void turnOff( const int count = -1, const int start = 0)
-        {
-            int end = count < 0 ? length : start + count;
-            for (int i = start; i < end; i++)
-            {
-                arr[i] = CRGB::Black;
-            }
+        ~LEDStrip() {
+            delete [] leds;
         }
-        ~LEDStrip(){
-            delete [] arr;
-        }
-        operator CRGB*(){
-            return this->arr;
-        } 
-        static LEDStrip create(int count, unsigned char id){
-            CRGB* arr = (CRGB*) malloc(sizeof(CRGB) * count); 
-            return LEDStrip{arr, count, id};
+
+        static LEDStrip create(const int count, const unsigned char id) {
+            return LEDStrip{new CRGB[count], count, id};
         }
     };
-
 }

@@ -6,22 +6,31 @@
 //
 // Created by divyansh on 1/13/26.
 //
-namespace ROBO
-{
-    class UDPClient
-    {
+
+inline void blink() {
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(100);
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(100);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(100);
+    digitalWrite(LED_BUILTIN, HIGH);
+}
+
+namespace ROBO {
+    class UDPClient {
     private:
         WiFiUDP udp;
 
     public:
         UDPClient() = default;
-        void init(const char *ssid, const char *password, int port)
-        {
+
+        void init(const char *ssid, const char *password, const unsigned int port) {
             WiFi.begin(ssid, password);
             Serial.println("Connecting to WiFi");
-            while (WiFi.status() != WL_CONNECTED)
-            {
-                delay(500);
+            while (WiFi.status() != WL_CONNECTED) {
+                blink();
                 Serial.print(".");
             }
             Serial.println("Connected");
@@ -31,30 +40,36 @@ namespace ROBO
             udp.begin(port);
         }
 
-        ControlCommand get()
-        {
-            if (const int packetSize = udp.parsePacket(); packetSize == 4)
-            {
-                uint8_t buf[4];
-                udp.read(buf, 4);
+        ControlCommand get() {
+            const int packetSize = udp.parsePacket();
+            if (packetSize <= 0)
+                return NO_LED_STATE_CHANGE;
 
-                // Cast buff[0] to 16 bit then shift 8 bits to left which give xxxxxxx00000000,
-                // taking or with this gives xxxxxxxxyyyyyyyy
+            if (packetSize != 4) {
+                // Drain invalid packet
+                while (udp.available())
+                    udp.read();
+                return NO_LED_STATE_CHANGE;
+            }
 
-                // This assumes big endian of buff data;
-                const uint16_t timeSec = (static_cast<uint16_t>(buf[0]) << 8) | buf[1];
-                const uint8_t id = buf[2];
-                const uint8_t state = buf[3];
+            uint8_t buf[4];
+            udp.read(buf, 4);
 
-                // Basic validation
-                if (state > 1)
-                    return NO_LED_STATE_CHANGE;
-                return ControlCommand(state, id, timeSec);
-            };
-            return NO_LED_STATE_CHANGE;
+            // Cast buff[0] to 16 bit then shift 8 bits to left which give xxxxxxx00000000,
+            // taking or with this gives xxxxxxxxyyyyyyyy
+            // This assumes big endian of buff data;
+            const uint16_t timeSec = (static_cast<uint16_t>(buf[0]) << 8) | buf[1];
+            const uint8_t id = buf[2];
+            const uint8_t state = buf[3];
+
+            // Basic validation
+            if (state > 1)
+                return NO_LED_STATE_CHANGE;
+            return ControlCommand(state, id, timeSec);
         }
     };
 }
+
 // #include <ESP8266WiFi.h>
 // #include <WiFiUdp.h>
 
