@@ -1,12 +1,9 @@
 #include <Arduino.h>
-
-#include "FastLED.h"
 #include "LEDStrip.h"
 #include "config.h"
 #include "UDPClient.h"
+#include "LEDStripLoader.h"
 
-#define LED_TYPE WS2812B
-#define COLOR_MODE GBR
 #define ARRAY_LEN(x) (int) sizeof(x) / (int)sizeof(x[0])
 #define ID_START 0
 #define LED_COUNT 10
@@ -29,10 +26,7 @@ void setup() {
     delay(250);
     pinMode(LED_BUILTIN, OUTPUT);
 
-    FastLED.addLeds<WS2812B, 4, COLOR_MODE>(strips[0].getArr(), strips[0].getLength());
-    FastLED.addLeds<WS2812B, 5, COLOR_MODE>(strips[1].getArr(), strips[1].getLength());
-
-    FastLED.setBrightness(255);
+    ROBO::LEDStripLoader<D4,D5,D7>::init(strips);
     strips[0].turnOff();
     strips[1].turnOff();
 
