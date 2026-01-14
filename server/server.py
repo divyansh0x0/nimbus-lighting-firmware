@@ -18,6 +18,8 @@ class PacketData:
 
     def getStruct(self):
         return struct.pack("!BB",self.ecs_id,self.state.bits)
+    def __str__(self):
+        return "[Packet:"+ str(self.ecs_id) + "," + str(self.state)+"]"
 
 json_file = open("ips.json", "r")
 json_text = json_file.read()
@@ -62,9 +64,10 @@ def timed_listener(secs: int):
         esp_states = data[1]
         bits = UINT8BitMask()
         for i in range(len(esp_states)):
-            bit_state = 1 if esp_states[i] == "T" else 0
-            bits.setBit(i, bit_state)
+            bit_state = True if esp_states[i].lower() == "t" else False
+            bits.set_bit(i, bit_state)
         packet = PacketData(esp_id, bits)
+        print(packet)
         send_packet(packet)
 
 

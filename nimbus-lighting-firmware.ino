@@ -2,38 +2,31 @@
 #include "LEDStrip.h"
 #include "config.h"
 #include "UDPClient.h"
-#include "LEDStripLoader.h"
 
 #define ARRAY_LEN(x) (int) sizeof(x) / (int)sizeof(x[0])
-#define ID_START 0
+#define ID 0
 #define LED_COUNT 100
 
-unsigned char id_count = BASE_ID_COUNT;
-
-unsigned char getStripId() {
-    return id_count++;
-};
 ROBO::LEDStrip strips[] = {
-    ROBO::LEDStrip::create(LED_COUNT, getStripId()),
+    ROBO::LEDStrip(D4),
 };
-auto udpClient = ROBO::UDPClient(ID_START);
+
+
+auto udpClient = ROBO::UDPClient(ID);
 
 void setup() {
     Serial.begin(115200);
     delay(250);
     pinMode(LED_BUILTIN, OUTPUT);
 
-    ROBO::LEDStripLoader<D4>::init(strips);
-
-
     Serial.print("Available IDs:");
     for (int i = 0; i < ARRAY_LEN(strips); ++i) {
         strips[i].turnOff();
-        Serial.print(strips[i].getId());
         Serial.print(", ");
     }
     Serial.print("\n");
     udpClient.init(WIFI_SSID,WIFI_PASSWORD, UDP_PORT);
+    pinMode(D4, OUTPUT);
 }
 
 void loop() {
@@ -44,7 +37,7 @@ void loop() {
         else
             strips[i].turnOff();
     }
+
+    // digitalWrite(D4,HIGH);
     yield();
-
-
 }
