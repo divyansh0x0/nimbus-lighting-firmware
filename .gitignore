@@ -4,3 +4,4 @@
 build
 .venv
 config.h
+__pycache__
