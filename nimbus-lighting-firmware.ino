@@ -6,8 +6,8 @@
 
 #define ARRAY_LEN(x) (int) sizeof(x) / (int)sizeof(x[0])
 #define ID_START 0
-#define LED_COUNT 10
-#define TESTING_STRIP_PARTS 3
+#define LED_COUNT 100
+#define TESTING_STRIP_PARTS 10
 
 unsigned char id_count = BASE_ID_COUNT;
 
@@ -15,8 +15,6 @@ unsigned char getStripId() {
     return id_count++;
 };
 ROBO::LEDStrip strips[] = {
-    ROBO::LEDStrip::create(LED_COUNT, getStripId()),
-    ROBO::LEDStrip::create(LED_COUNT, getStripId()),
     ROBO::LEDStrip::create(LED_COUNT, getStripId()),
 };
 auto udpClient = ROBO::UDPClient();
@@ -26,12 +24,16 @@ void setup() {
     delay(250);
     pinMode(LED_BUILTIN, OUTPUT);
 
-    ROBO::LEDStripLoader<D4,D5,D7>::init(strips);
-    strips[0].turnOff();
-    strips[1].turnOff();
+    ROBO::LEDStripLoader<D4>::init(strips);
 
-    FastLED.show();
 
+    Serial.print("Available IDs:");
+    for (int i = 0; i < ARRAY_LEN(strips); ++i) {
+        strips[i].turnOff();
+        Serial.print(strips[i].getId());
+        Serial.print(", ");
+    }
+    Serial.print("\n");
     udpClient.init(WIFI_SSID,WIFI_PASSWORD, UDP_PORT);
 }
 
@@ -94,5 +96,7 @@ void loop() {
     Serial.println("id:" + String(cmd.id));
     Serial.println(cmd.state == ROBO::LEDState::ON ? "ON" : "OFF");
     singleStripCmd(cmd);
-    delay(100);
+    yield();
+
+
 }

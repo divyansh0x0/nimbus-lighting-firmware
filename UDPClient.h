@@ -45,6 +45,7 @@ namespace ROBO {
                 return NO_LED_STATE_CHANGE;
 
             constexpr int BUFFER_LEN = 2;
+            Serial.println(packetSize);
             if (packetSize != BUFFER_LEN) {
                 // Drain invalid packet
                 while (udp.available())
