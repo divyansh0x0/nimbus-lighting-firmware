@@ -5,7 +5,6 @@
 #include "ControlCommands.h"
 
 inline void blink() {
-    pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, LOW);
     delay(50);
     digitalWrite(LED_BUILTIN, HIGH);
@@ -20,9 +19,14 @@ namespace ROBO {
     class UDPClient {
     private:
         WiFiUDP udp;
+        unsigned char last_state_byte = 0;
+        unsigned char last_state_arr[state_count] = {0, 0, 0, 0, 0};
+        unsigned char esp_id = 0;
 
     public:
-        UDPClient() = default;
+        static constexpr  int state_count = 5;
+        UDPClient(unsigned char esp_id) : esp_id(esp_id) {
+        };
 
         void init(const char *ssid, const char *password, const unsigned int port) {
             WiFi.begin(ssid, password);
@@ -30,7 +34,7 @@ namespace ROBO {
             while (WiFi.status() != WL_CONNECTED) {
                 delay(500);
                 blink();
-                Serial.println("Connecting to "+String(ssid) + "...");
+                Serial.println("Connecting to " + String(ssid) + "...");
             }
             Serial.println("Connected");
             Serial.print("Local IP:");
@@ -39,33 +43,33 @@ namespace ROBO {
             udp.begin(port);
         }
 
-        LEDControlCommand get() {
+        unsigned char *get() {
             const int packetSize = udp.parsePacket();
             if (packetSize <= 0)
-                return NO_LED_STATE_CHANGE;
+                return last_state_arr;
 
             constexpr int BUFFER_LEN = 2;
             Serial.println(packetSize);
-            if (packetSize != BUFFER_LEN) {
-                // Drain invalid packet
-                while (udp.available())
-                    udp.read();
-                return NO_LED_STATE_CHANGE;
-            }
 
             uint8_t buf[BUFFER_LEN];
             udp.read(buf, BUFFER_LEN);
 
-            // Cast buff[0] to 16 bit then shift 8 bits to left which give xxxxxxx00000000,
-            // taking or with this gives xxxxxxxxyyyyyyyy
-            // This assumes big endian of buff data;
-            const uint8_t id = buf[0];
-            const uint8_t state = buf[1];
+            // Skip if not the id of this ESP
+            if (buf[0] != esp_id)
+                return last_state_arr;
 
-            // Basic validation
-            if (state > 1)
-                return NO_LED_STATE_CHANGE;
-            return LEDControlCommand(state, id);
+            const uint8_t states = buf[1];
+            if (states == last_state_byte)
+                return last_state_arr;
+            unsigned char mask = 0b1;
+            for (int i = 0; i < state_count; ++i) {
+                last_state_arr[i] = states & mask;
+                mask <<= 1;
+            }
+            last_state_byte = states;
+
+
+            return last_state_arr;
         }
     };
 }

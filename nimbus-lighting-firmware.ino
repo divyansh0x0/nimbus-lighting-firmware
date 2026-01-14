@@ -7,7 +7,6 @@
 #define ARRAY_LEN(x) (int) sizeof(x) / (int)sizeof(x[0])
 #define ID_START 0
 #define LED_COUNT 100
-#define TESTING_STRIP_PARTS 10
 
 unsigned char id_count = BASE_ID_COUNT;
 
@@ -17,7 +16,7 @@ unsigned char getStripId() {
 ROBO::LEDStrip strips[] = {
     ROBO::LEDStrip::create(LED_COUNT, getStripId()),
 };
-auto udpClient = ROBO::UDPClient();
+auto udpClient = ROBO::UDPClient(ID_START);
 
 void setup() {
     Serial.begin(115200);
@@ -37,65 +36,14 @@ void setup() {
     udpClient.init(WIFI_SSID,WIFI_PASSWORD, UDP_PORT);
 }
 
-/**
- * For testing purpose only, redundant in production
-*/
-void singleStripCmd(const ROBO::LEDControlCommand cmd) {
-    auto &led_strip = strips[0]; // use reference to avoid copying
-    if (cmd.id < 0 || cmd.id >= TESTING_STRIP_PARTS) {
-        Serial.println("id:" + String(cmd.id) + " is invalid. Skipping over");
-        return;
-    }
-
-    int partSize = led_strip.getLength() / TESTING_STRIP_PARTS;
-    int start = cmd.id * partSize;
-    int end = start + partSize;
-    if (cmd.id == TESTING_STRIP_PARTS - 1) {
-        end = led_strip.getLength(); // include any remainder
-    }
-    int length = end - start;
-    switch (cmd.state) {
-        case ROBO::LEDState::ON:
-            led_strip.turnOn(length, start);
-            break;
-        case ROBO::LEDState::OFF:
-            led_strip.turnOff(length, start);
-            break;
-        case ROBO::LEDState::UNSET:
-            // do nothing
-            break;
-    }
-}
-
-
-void handleMultiStripCmd(const ROBO::LEDControlCommand cmd) {
-    if (cmd.id < BASE_ID_COUNT || cmd.id > BASE_ID_COUNT + ARRAY_LEN(strips)) {
-        Serial.println("id:" + String(cmd.id) + " is invalid. Skipping over");
-        return;
-    }
-    const int index = cmd.id - BASE_ID_COUNT;
-    ROBO::LEDStrip strip = strips[index];
-    switch (cmd.state) {
-        case ROBO::LEDState::ON:
-            strip.turnOn();
-            break;
-        case ROBO::LEDState::OFF:
-            strip.turnOff();
-            break;
-        case ROBO::LEDState::UNSET:
-            break;
-    }
-}
-
 void loop() {
-    const ROBO::LEDControlCommand cmd = udpClient.get();
-    if (cmd.state == ROBO::LEDState::UNSET) {
-        return;
+    const auto cmd = udpClient.get();
+    for (int i = 0; i < ARRAY_LEN(strips); ++i) {
+        if (cmd[i])
+            strips[i].turnOn();
+        else
+            strips[i].turnOff();
     }
-    Serial.println("----");
-    Serial.println("id:" + String(cmd.id));
-    Serial.println(cmd.state == ROBO::LEDState::ON ? "ON" : "OFF");
-    singleStripCmd(cmd);
     yield();
 
 

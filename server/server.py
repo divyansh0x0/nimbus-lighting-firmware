@@ -39,12 +39,14 @@ def start_listener():
     bits = UINT8BitMask()
     for i in range(ESP_COUNT):
         packet = PacketData(i, bits)
+        send_packet(packet)
 
 
-
+def stop_listener():
     bits = UINT8BitMask()
     for i in range(ESP_COUNT):
         packet = PacketData(i, bits)
+        send_packet(packet)
 
 
 def timed_listener(secs: int):
