@@ -1,26 +1,36 @@
-from typing import Literal
-
-
 class UINT8BitMask:
-    __BIT_COUNT= 8
+    __BIT_COUNT = 8
+    __MASK = 0xFF
+
     def __init__(self):
-        self.bits:int = 0x00000000
+        self.bits: int = 0
 
-    def setBit(self, bit_index:int, state: int):
+    def set_bit(self, bit_index: int, state: bool) -> None:
+        if not 0 <= bit_index < self.__BIT_COUNT:
+            raise IndexError("bit_index must be in range 0..7")
+
+        shift = self.__BIT_COUNT - 1 - bit_index
+        mask = 1 << shift
+
         if state:
-            self.bits |= 1 << (UINT8BitMask.__BIT_COUNT - 1 - bit_index)
+            self.bits |= mask
         else:
-            self.bits &= ~(1 << (UINT8BitMask.__BIT_COUNT - bit_index))
+            self.bits &= ~mask
 
-        self._validate_state()
-    def _validate_state(self):
-        # ensure only first 8 bits are set
-        self.bits &= 0xFF
-    def __str__(self):
+        self.bits &= self.__MASK
+
+    def get_bit(self, bit_index: int) -> int:
+        if not 0 <= bit_index < self.__BIT_COUNT:
+            raise IndexError("bit_index must be in range 0..7")
+
+        shift = self.__BIT_COUNT - 1 - bit_index
+        return (self.bits >> shift) & 1
+
+    def clear(self) -> None:
+        self.bits = 0
+
+    def __int__(self) -> int:
+        return self.bits
+
+    def __str__(self) -> str:
         return format(self.bits, "08b")
-
-mask = UINT8BitMask()
-mask.setBit(3,1)
-print(mask)
-mask.setBit(0,1)
-print(mask)
