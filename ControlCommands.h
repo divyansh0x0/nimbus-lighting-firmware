@@ -7,8 +7,8 @@ namespace ROBO{
         UNSET = 2,
     };
     struct LEDControlCommand{
-        LEDState state;
-        uint8_t id;
+        LEDState state = LEDState::UNSET;
+        uint8_t id = 0;
 
         LEDControlCommand() = default;
 

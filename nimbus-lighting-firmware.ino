@@ -8,7 +8,7 @@
 #define ID_START 0
 #define LED_COUNT 100
 #define TESTING_STRIP_PARTS 10
-
+#define ESP_ID 1
 unsigned char id_count = BASE_ID_COUNT;
 
 unsigned char getStripId() {
@@ -17,7 +17,7 @@ unsigned char getStripId() {
 ROBO::LEDStrip strips[] = {
     ROBO::LEDStrip::create(LED_COUNT, getStripId()),
 };
-auto udpClient = ROBO::UDPClient();
+auto udpClient = ROBO::UDPClient(ESP_ID);
 
 void setup() {
     Serial.begin(115200);
@@ -88,14 +88,16 @@ void handleMultiStripCmd(const ROBO::LEDControlCommand cmd) {
 }
 
 void loop() {
-    const ROBO::LEDControlCommand cmd = udpClient.get();
-    if (cmd.state == ROBO::LEDState::UNSET) {
-        return;
-    }
-    Serial.println("----");
-    Serial.println("id:" + String(cmd.id));
-    Serial.println(cmd.state == ROBO::LEDState::ON ? "ON" : "OFF");
-    singleStripCmd(cmd);
+    const ROBO::LEDControlCommand* cmd_arr = udpClient.get();
+    // for (int i = 0; i < MAX_DATALINES; ++i) {
+    //     const ROBO::LEDControlCommand cmd = cmd_arr[i];
+    //     if (cmd.state == ROBO::LEDState::UNSET)
+    //         continue;
+    //     Serial.println("id:" + String(cmd.id));
+    //     Serial.println(cmd.state == ROBO::LEDState::ON ? "ON" : "OFF");
+    //     handleMultiStripCmd(cmd);
+
+    // }
     yield();
 
 
