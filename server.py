@@ -6,12 +6,12 @@ import re
 from typing import Dict
 
 server_ip = "0.0.0.0"
-server_port = "8080"
+server_port = 8080
 BUFFER_SIZE = 1024
 
-NO_OF_ESP_IN_NETWORK = 3
+NO_OF_ESP_IN_NETWORK = 1
 ServerSocket = None
-isMusicStarted = False
+isMusicStarted = True
 start_time = None
 MAX_NO_OF_LED_STRIP_IN_ESP = 5
 
@@ -25,7 +25,7 @@ class Esp(object):
         self.node_id = node_id
         self.no_of_led_strip_in_it = no_of_led_strip_in_it
         self.ip_address = ip_address
-        self.last_state = None
+        self.last_state = 0b00000
 
     def send_command(self, ledstate:LEDSTATE, led_strip_nos:list):
         if len(self.led_strip_nos) > self.no_of_led_strip_in_it:
@@ -58,10 +58,9 @@ except socket.error as e:
         raise
 
 my_pattern = [
-[1, LEDSTATE.POWERON, {1: [1,2,3]}]
-[3, LEDSTATE.POWERON, {1: [4,5,6]}],
-[4, LEDSTATE.POWEROFF, {1:[4,2,6]}],
-[7, LEDSTATE.POWEROFF, "ALL"]
+[1, LEDSTATE.POWERON, {1: [1,2,3]}],
+[3, LEDSTATE.POWERON, {1: [4,5]}],
+[4, LEDSTATE.POWEROFF, {1:[4,2,1]}]
 ]
 
 def get_time():
@@ -98,6 +97,5 @@ if __name__ == "__main__":
             time_to_fire_comm, led_state,led_to_change = command[0], command[1], command[2]
 
             if time_to_fire_comm <= get_time():
-                for i in led_to_change:
-                    Espobj[i].send_command(led_to_change, led_state,led_to_change[i])
-
+                for esp_index in led_to_change:
+                    Espobj[esp_index].send_command(led_to_change, led_state,led_to_change[i])
