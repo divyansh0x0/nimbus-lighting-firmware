@@ -85,6 +85,7 @@ namespace ROBO {
                 return;
             for (int i = start; i < end; i++) {
                 leds[i] = color;
+            // Serial.println("Changing color " + String(leds[i].toString().c_str()));
             }
             Serial.println("id:" + String(id) + " is ON from " + String(start) + " to " + String(end));
             FastLED.show();
@@ -106,6 +107,9 @@ namespace ROBO {
             FastLED.show();
         }
 
+        unsigned char getId(){
+            return this->id;
+        }
         ~LEDStrip() {
             delete [] leds;
         }
