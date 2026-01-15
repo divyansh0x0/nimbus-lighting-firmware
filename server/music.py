@@ -6,16 +6,19 @@ class MusicPlayer:
         self.timed_listener = timed_listener
         self.start_listener = start_listener
         self.stop_listener = stop_listener
-        self.last_pos = 0
+        self.last_ms = -1  # Track last second
 
     def playMusic(self, file: str):
         pygame.mixer.init()
         pygame.mixer.music.load(file)
         pygame.mixer.music.play()
+        self.start_listener()  # optional start event
 
         while pygame.mixer.music.get_busy():
             pos_ms = pygame.mixer.music.get_pos()
-            self.timed_listener(pos_ms)
 
-def timestamp_listener(pos_ms: int):
-    print(pos_ms)
+            if pos_ms != self.last_ms:  # Only trigger on new second
+                self.last_ms = pos_ms
+                self.timed_listener(pos_ms)
+
+        self.stop_listener()  # optional stop event

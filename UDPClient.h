@@ -61,11 +61,11 @@ namespace ROBO {
 
             const uint8_t states = buf[1];
             if (states == last_state_byte) {
-                Serial.println("Same state received: " + String(states, BIN));
+                // Serial.println("Same state received: " + String(states, BIN));
                 return last_state_arr;
             }
             unsigned char mask = 0b1;
-            Serial.print(states, BIN);
+            Serial.println(states, BIN);
 
             for (int i = 0; i < state_count; ++i) {
                 int bit_index = 7 - i; // MSB first

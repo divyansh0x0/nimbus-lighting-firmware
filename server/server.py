@@ -51,14 +51,13 @@ def stop_listener():
         send_packet(packet)
 
 
-def timed_listener(secs: int):
-    print(secs)
-    if secs not in LIGHTING_STATES:
+def timed_listener(ms: int):
+    print(f"\rTime:{(ms/1000):.2f}s", end="")
+    if ms not in LIGHTING_STATES:
         return
-    data_list = LIGHTING_STATES[secs]
+    data_list = LIGHTING_STATES[ms]
     if not data_list:
         return
-
     for data in data_list:
         esp_id = data[0]
         esp_states = data[1]
@@ -67,7 +66,7 @@ def timed_listener(secs: int):
             bit_state = True if esp_states[i].lower() == "t" else False
             bits.set_bit(i, bit_state)
         packet = PacketData(esp_id, bits)
-        print(packet)
+        print("\nSent:",packet)
         send_packet(packet)
 
 
