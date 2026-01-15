@@ -6,7 +6,7 @@ namespace ROBO {
     class LEDStrip {
     private:
         unsigned char out_pin;
-
+        unsigned char state = 0;
 
 
     public:
@@ -17,13 +17,13 @@ namespace ROBO {
            pinMode(out_pin, OUTPUT);
         };
         void turnOn() {
-            Serial.println("Turning on LED connected to"+String(out_pin));
-            digitalWrite(out_pin, HIGH);
+            // Serial.println("Turning on LED connected to "+String(out_pin));
+            analogWrite(out_pin, 255);
         }
 
         void turnOff() {
-            Serial.println("Turning off LED connected to"+String(out_pin));
-            digitalWrite(out_pin, LOW);
+            // Serial.println("Turning off LED connected to "+String(out_pin));
+            analogWrite(out_pin, 0);
         }
     };
 }

@@ -37,7 +37,5 @@ void loop() {
         else
             strips[i].turnOff();
     }
-
-    // digitalWrite(D4,HIGH);
     yield();
 }
