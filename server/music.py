@@ -18,6 +18,7 @@ class MusicPlayer:
             pos_ms = pygame.mixer.music.get_pos()
 
             if pos_ms != self.last_ms:  # Only trigger on new second
+                print(f"\rTime:{(pos_ms/1000):.2f}s", end="")
                 self.last_ms = pos_ms
                 self.timed_listener(pos_ms)
 

@@ -1,9 +1,9 @@
 LIGHTING_STATES = \
     {
         0:      [[0, "TFFFF"]],
-        4200:   [[0, "TFTTF"]],
-        9100:   [[0, "TFFTF"]],
-        13750:  [[0, "FFTTF"]],
+        4200:   [[1, "TFTTF"]],
+        9100:   [[1, "TFFTF"]],
+        13750:  [[1, "FFTTF"]],
         18100:  [[0, "FTTFF"]],
         22600:  [[0, "TTFFF"]],
         28150:  [[0, "FTFTF"]],
@@ -31,4 +31,4 @@ LIGHTING_STATES = \
         200000: [[0, "FTTFF"]],
     }
 
-ESP_COUNT = 3
+ESP_COUNT = 1
